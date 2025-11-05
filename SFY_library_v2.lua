@@ -1970,7 +1970,7 @@ function GuiLibrary:CreateColorPicker(tab, pickerName, defaultColor, callback)
     return colorPickerObj
 end
 
--- FIXED Multi Dropdown Function
+-- FIXED Multi Dropdown Function (Count Display Only)
 function GuiLibrary:CreateMultiDropdown(tab, dropdownName, options, defaultSelections, callback)
     local uniqueName = "MultiDropdown_" .. dropdownName .. "_" .. tostring(tick()):gsub("%.", "")
     
@@ -2082,24 +2082,18 @@ function GuiLibrary:CreateMultiDropdown(tab, dropdownName, options, defaultSelec
         end
     end
     
-    -- FIXED: Improved display text function
+    -- FIXED: Simplified display text function - ONLY SHOW COUNT
     local function updateDisplayText()
         local selectedCount = 0
-        local selectedNames = {}
         
         for option, isSelected in pairs(selectedOptions) do
             if isSelected then
                 selectedCount = selectedCount + 1
-                table.insert(selectedNames, option)
             end
         end
         
         if selectedCount == 0 then
             valueLabel.Text = "Select..."
-        elseif selectedCount == 1 then
-            valueLabel.Text = selectedNames[1]
-        elseif selectedCount <= 3 then
-            valueLabel.Text = table.concat(selectedNames, ", ")
         else
             valueLabel.Text = selectedCount .. " selected"
         end
