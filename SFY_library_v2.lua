@@ -2784,8 +2784,321 @@ function GuiLibrary:CreatePlayerList(tab, listName, callback)
 end
 
 
+--#add function here
 
+-- Progress Bar Function
+function GuiLibrary:CreateProgressBar(tab, progressName, minValue, maxValue, defaultValue, callback)
+    local progressBar = Instance.new("Frame")
+    progressBar.Name = "ProgressBar_" .. progressName
+    progressBar.Size = UDim2.new(1, 0, 0, 60)
+    progressBar.BackgroundTransparency = 1
+    progressBar.Parent = tab.Frame
+    
+    local label = Instance.new("TextLabel")
+    label.Name = "Label"
+    label.Size = UDim2.new(1, 0, 0, 20)
+    label.BackgroundTransparency = 1
+    label.Text = progressName
+    label.TextColor3 = Theme.Text
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.Gotham
+    label.Parent = progressBar
+    
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Name = "Value"
+    valueLabel.Size = UDim2.new(0, 60, 0, 20)
+    valueLabel.Position = UDim2.new(1, -60, 0, 0)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.Text = tostring(defaultValue or minValue) .. "/" .. tostring(maxValue)
+    valueLabel.TextColor3 = Theme.TextSecondary
+    valueLabel.TextSize = 12
+    valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+    valueLabel.Font = Enum.Font.Gotham
+    valueLabel.Parent = progressBar
+    
+    local progressTrack = Instance.new("Frame")
+    progressTrack.Name = "Track"
+    progressTrack.Size = UDim2.new(1, 0, 0, 20)
+    progressTrack.Position = UDim2.new(0, 0, 0, 30)
+    progressTrack.BackgroundColor3 = Theme.Secondary
+    progressTrack.BorderSizePixel = 0
+    progressTrack.Parent = progressBar
+    
+    local trackCorner = Instance.new("UICorner")
+    trackCorner.CornerRadius = UDim.new(0, 10)
+    trackCorner.Parent = progressTrack
+    
+    local progressFill = Instance.new("Frame")
+    progressFill.Name = "Fill"
+    progressFill.Size = UDim2.new(0, 0, 1, 0)
+    progressFill.BackgroundColor3 = Theme.Accent
+    progressFill.BorderSizePixel = 0
+    progressFill.Parent = progressTrack
+    
+    local fillCorner = Instance.new("UICorner")
+    fillCorner.CornerRadius = UDim.new(0, 10)
+    fillCorner.Parent = progressFill
+    
+    -- Percentage label inside progress bar
+    local percentageLabel = Instance.new("TextLabel")
+    percentageLabel.Name = "Percentage"
+    percentageLabel.Size = UDim2.new(1, 0, 1, 0)
+    percentageLabel.BackgroundTransparency = 1
+    percentageLabel.Text = "0%"
+    percentageLabel.TextColor3 = Theme.Text
+    percentageLabel.TextSize = 12
+    percentageLabel.Font = Enum.Font.GothamBold
+    percentageLabel.Parent = progressTrack
+    
+    local currentValue = defaultValue or minValue
+    local min = minValue or 0
+    local max = maxValue or 100
+    
+    local function updateProgress(value, triggerCallback)
+        currentValue = math.clamp(value, min, max)
+        local percentage = (currentValue - min) / (max - min)
+        local fillWidth = percentage * progressTrack.AbsoluteSize.X
+        
+        progressFill.Size = UDim2.new(percentage, 0, 1, 0)
+        valueLabel.Text = tostring(math.floor(currentValue)) .. "/" .. tostring(max)
+        percentageLabel.Text = string.format("%d%%", math.floor(percentage * 100))
+        
+        -- Auto-adjust text color for better visibility
+        if percentage > 0.5 then
+            percentageLabel.TextColor3 = Color3.new(1, 1, 1)
+        else
+            percentageLabel.TextColor3 = Theme.Text
+        end
+        
+        if triggerCallback and callback then
+            callback(currentValue, percentage)
+        end
+    end
+    
+    -- Initialize with default value
+    updateProgress(currentValue, false)
+    
+    -- Create progress bar object with methods
+    local progressBarObj = {}
+    
+    function progressBarObj:GetValue()
+        return currentValue
+    end
+    
+    function progressBarObj:SetValue(value)
+        updateProgress(value, true)
+    end
+    
+    function progressBarObj:SetRange(newMin, newMax)
+        min = newMin or min
+        max = newMax or max
+        updateProgress(currentValue, false) -- Re-validate current value
+    end
+    
+    function progressBarObj:Increment(amount)
+        amount = amount or 1
+        updateProgress(currentValue + amount, true)
+    end
+    
+    function progressBarObj:Decrement(amount)
+        amount = amount or 1
+        updateProgress(currentValue - amount, true)
+    end
+    
+    function progressBarObj:GetPercentage()
+        return (currentValue - min) / (max - min)
+    end
+    
+    function progressBarObj:SetColor(color)
+        progressFill.BackgroundColor3 = color or Theme.Accent
+    end
+    
+    function progressBarObj:Reset()
+        updateProgress(min, true)
+    end
+    
+    function progressBarObj:SetToMax()
+        updateProgress(max, true)
+    end
+    
+    function progressBarObj:IsComplete()
+        return currentValue >= max
+    end
+    
+    function progressBarObj:GetInstance()
+        return progressBar
+    end
+    
+    return progressBarObj
+end
 
+-- Temporary Progress Bar Function (Auto-removing)
+function GuiLibrary:CreateTemporaryProgressBar(progressName, duration, callback)
+    local temporaryProgress = {}
+    temporaryProgress.Destroyed = false
+    
+    -- Create ScreenGui for temporary progress bar
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "TemporaryProgress_" .. progressName
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    screenGui.ResetOnSpawn = false
+    
+    -- Main container
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 300, 0, 80)
+    mainFrame.Position = UDim2.new(0.5, -150, 0.1, 0)
+    mainFrame.BackgroundColor3 = Theme.Background
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = mainFrame
+    
+    local shadow = Instance.new("ImageLabel")
+    shadow.Size = UDim2.new(1, 15, 1, 15)
+    shadow.Position = UDim2.new(0, -7, 0, -7)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.ImageTransparency = 0.85
+    shadow.ScaleType = Enum.ScaleType.Slice
+    shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+    shadow.Parent = mainFrame
+    
+    -- Title
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -20, 0, 25)
+    title.Position = UDim2.new(0, 10, 0, 10)
+    title.BackgroundTransparency = 1
+    title.Text = progressName
+    title.TextColor3 = Theme.Text
+    title.TextSize = 14
+    title.Font = Enum.Font.GothamBold
+    title.Parent = mainFrame
+    
+    -- Progress track
+    local progressTrack = Instance.new("Frame")
+    progressTrack.Size = UDim2.new(1, -20, 0, 20)
+    progressTrack.Position = UDim2.new(0, 10, 0, 40)
+    progressTrack.BackgroundColor3 = Theme.Secondary
+    progressTrack.BorderSizePixel = 0
+    progressTrack.Parent = mainFrame
+    
+    local trackCorner = Instance.new("UICorner")
+    trackCorner.CornerRadius = UDim.new(0, 10)
+    trackCorner.Parent = progressTrack
+    
+    -- Progress fill
+    local progressFill = Instance.new("Frame")
+    progressFill.Size = UDim2.new(0, 0, 1, 0)
+    progressFill.BackgroundColor3 = Theme.Accent
+    progressFill.BorderSizePixel = 0
+    progressFill.Parent = progressTrack
+    
+    local fillCorner = Instance.new("UICorner")
+    fillCorner.CornerRadius = UDim.new(0, 10)
+    fillCorner.Parent = progressFill
+    
+    -- Percentage label
+    local percentageLabel = Instance.new("TextLabel")
+    percentageLabel.Size = UDim2.new(1, 0, 1, 0)
+    percentageLabel.BackgroundTransparency = 1
+    percentageLabel.Text = "0%"
+    percentageLabel.TextColor3 = Theme.Text
+    percentageLabel.TextSize = 12
+    percentageLabel.Font = Enum.Font.GothamBold
+    percentageLabel.Parent = progressTrack
+    
+    -- Time remaining label
+    local timeLabel = Instance.new("TextLabel")
+    timeLabel.Size = UDim2.new(1, -20, 0, 15)
+    timeLabel.Position = UDim2.new(0, 10, 0, 62)
+    timeLabel.BackgroundTransparency = 1
+    timeLabel.Text = "Time remaining: " .. duration .. "s"
+    timeLabel.TextColor3 = Theme.TextSecondary
+    timeLabel.TextSize = 10
+    timeLabel.TextXAlignment = Enum.TextXAlignment.Right
+    timeLabel.Font = Enum.Font.Gotham
+    timeLabel.Parent = mainFrame
+    
+    local startTime = tick()
+    local endTime = startTime + duration
+    
+    -- Animation function
+    local function animateProgress()
+        while tick() < endTime and not temporaryProgress.Destroyed do
+            local elapsed = tick() - startTime
+            local progress = elapsed / duration
+            local remaining = duration - elapsed
+            
+            progressFill.Size = UDim2.new(progress, 0, 1, 0)
+            percentageLabel.Text = string.format("%d%%", math.floor(progress * 100))
+            timeLabel.Text = string.format("Time remaining: %.1fs", remaining)
+            
+            -- Auto-adjust text color
+            if progress > 0.5 then
+                percentageLabel.TextColor3 = Color3.new(1, 1, 1)
+            else
+                percentageLabel.TextColor3 = Theme.Text
+            end
+            
+            if callback then
+                callback(progress, remaining)
+            end
+            
+            wait(0.1)
+        end
+        
+        -- Complete animation
+        if not temporaryProgress.Destroyed then
+            progressFill.Size = UDim2.new(1, 0, 1, 0)
+            percentageLabel.Text = "100%"
+            timeLabel.Text = "Completed!"
+            
+            if callback then
+                callback(1, 0)
+            end
+            
+            -- Auto-remove after completion
+            wait(2)
+            temporaryProgress:Destroy()
+        end
+    end
+    
+    -- Start animation
+    spawn(animateProgress)
+    
+    -- Methods for temporary progress bar
+    function temporaryProgress:Destroy()
+        if not self.Destroyed then
+            self.Destroyed = true
+            if screenGui and screenGui.Parent then
+                screenGui:Destroy()
+            end
+        end
+    end
+    
+    function temporaryProgress:GetRemainingTime()
+        return math.max(0, endTime - tick())
+    end
+    
+    function temporaryProgress:GetProgress()
+        local elapsed = tick() - startTime
+        return math.min(1, elapsed / duration)
+    end
+    
+    function temporaryProgress:IsComplete()
+        return tick() >= endTime
+    end
+    
+    function temporaryProgress:GetInstance()
+        return screenGui
+    end
+    
+    return temporaryProgress
+end
 
 
 
