@@ -1969,7 +1969,6 @@ function GuiLibrary:CreateColorPicker(tab, pickerName, defaultColor, callback)
     
     return colorPickerObj
 end
-
 -- FIXED Multi Dropdown Function (Count Display Only)
 function GuiLibrary:CreateMultiDropdown(tab, dropdownName, options, defaultSelections, callback)
     local uniqueName = "MultiDropdown_" .. dropdownName .. "_" .. tostring(tick()):gsub("%.", "")
@@ -2291,7 +2290,7 @@ function GuiLibrary:CreateMultiDropdown(tab, dropdownName, options, defaultSelec
             end
         end
         
-        -- Update button appearances
+        -- FIXED: Update ALL button appearances, not just the ones that changed
         for _, optionButton in pairs(optionsFrame:GetChildren()) do
             if optionButton:IsA("TextButton") and optionButton.Name:find("Option_") then
                 local option = optionButton.Name:sub(8) -- Remove "Option_" prefix
@@ -2313,15 +2312,47 @@ function GuiLibrary:CreateMultiDropdown(tab, dropdownName, options, defaultSelec
     end
     
     function multiDropdownObj:ClearSelections()
-        self:SetSelections({})
+        -- FIXED: Properly clear all selections
+        for option in pairs(selectedOptions) do
+            selectedOptions[option] = false
+        end
+        
+        -- Update all button appearances
+        for _, optionButton in pairs(optionsFrame:GetChildren()) do
+            if optionButton:IsA("TextButton") and optionButton.Name:find("Option_") then
+                optionButton.BackgroundColor3 = Theme.Secondary
+            end
+        end
+        
+        updateDisplayText()
+        
+        -- Trigger callback
+        if callback then
+            callback({}, {})
+        end
     end
     
     function multiDropdownObj:SelectAll()
         local allSelections = {}
         for _, option in ipairs(options) do
+            selectedOptions[option] = true
             allSelections[option] = true
         end
-        self:SetSelections(allSelections)
+        
+        -- Update all button appearances
+        for _, optionButton in pairs(optionsFrame:GetChildren()) do
+            if optionButton:IsA("TextButton") and optionButton.Name:find("Option_") then
+                optionButton.BackgroundColor3 = Theme.Accent
+            end
+        end
+        
+        updateDisplayText()
+        
+        -- Trigger callback
+        if callback then
+            local selectionsArray = self:GetSelections()
+            callback(selectionsArray, selectedOptions)
+        end
     end
     
     function multiDropdownObj:IsSelected(option)
@@ -2346,7 +2377,6 @@ function GuiLibrary:CreateMultiDropdown(tab, dropdownName, options, defaultSelec
     
     return multiDropdownObj
 end
-
 --#add function here
 
 -- Number Input Field Function
