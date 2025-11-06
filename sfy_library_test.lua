@@ -3336,7 +3336,6 @@ function GuiLibrary:SetVersion(versionText)
         end
     end
 end
-
 -- Function to create a comprehensive system info display
 function GuiLibrary:CreateSystemInfo(tab, includePerformance)
     local systemInfo = {
@@ -3384,13 +3383,13 @@ function GuiLibrary:CreateSystemInfo(tab, includePerformance)
                     lastTime = currentTime
                     
                     -- Update FPS in the table
-                    local fpsLabel = infoTable:FindFirstChild("TableFrame")
-                    if fpsLabel then
-                        fpsLabel = fpsLabel:FindFirstChild("Row_FPS")
-                        if fpsLabel then
-                            fpsLabel = fpsLabel:FindFirstChild("Value")
-                            if fpsLabel then
-                                fpsLabel.Text = tostring(fps) .. " FPS"
+                    local tableFrame = infoTable:FindFirstChild("TableFrame")
+                    if tableFrame then
+                        local rowFPS = tableFrame:FindFirstChild("Row_FPS")
+                        if rowFPS then
+                            local valueLabel = rowFPS:FindFirstChild("Value")
+                            if valueLabel then
+                                valueLabel.Text = tostring(fps) .. " FPS"
                             end
                         end
                     end
@@ -3405,13 +3404,13 @@ function GuiLibrary:CreateSystemInfo(tab, includePerformance)
                 local ping = math.random(30, 80) -- Simulated ping
                 -- In a real implementation, you'd measure actual ping
                 
-                local pingLabel = infoTable:FindFirstChild("TableFrame")
-                if pingLabel then
-                    pingLabel = pingLabel:FindFirstChild("Row_Ping")
-                    if pingLabel then
-                        pingLabel = pingLabel:FindFirstChild("Value")
-                        if pingLabel then
-                            pingLabel.Text = tostring(ping) .. " ms"
+                local tableFrame = infoTable:FindFirstChild("TableFrame")
+                if tableFrame then
+                    local rowPing = tableFrame:FindFirstChild("Row_Ping")
+                    if rowPing then
+                        local valueLabel = rowPing:FindFirstChild("Value")
+                        if valueLabel then
+                            valueLabel.Text = tostring(ping) .. " ms"
                         end
                     end
                 end
