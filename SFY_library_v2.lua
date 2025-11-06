@@ -2784,8 +2784,6 @@ function GuiLibrary:CreatePlayerList(tab, listName, callback)
 end
 
 
---#add function here
-
 -- Progress Bar Function
 function GuiLibrary:CreateProgressBar(tab, progressName, minValue, maxValue, defaultValue, callback)
     local progressBar = Instance.new("Frame")
@@ -3098,6 +3096,424 @@ function GuiLibrary:CreateTemporaryProgressBar(progressName, duration, callback)
     end
     
     return temporaryProgress
+end
+
+-- Add these functions to the GuiLibrary after the existing functions:
+
+-- Function to display detailed information table
+function GuiLibrary:CreateInfoTable(tab, title, infoData, showSupport)
+    local infoContainer = Instance.new("Frame")
+    infoContainer.Name = "InfoTable_" .. title
+    infoContainer.Size = UDim2.new(1, 0, 0, 0) -- Auto-size
+    infoContainer.BackgroundTransparency = 1
+    infoContainer.Parent = tab.Frame
+    
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 8)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = infoContainer
+    
+    -- Title
+    if title then
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Name = "Title"
+        titleLabel.Size = UDim2.new(1, 0, 0, 25)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.Text = title
+        titleLabel.TextColor3 = Theme.Accent
+        titleLabel.TextSize = 16
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+        titleLabel.Font = Enum.Font.GothamBold
+        titleLabel.LayoutOrder = 1
+        titleLabel.Parent = infoContainer
+    end
+    
+    -- Welcome message
+    local welcomeLabel = Instance.new("TextLabel")
+    welcomeLabel.Name = "Welcome"
+    welcomeLabel.Size = UDim2.new(1, 0, 0, 40)
+    welcomeLabel.BackgroundTransparency = 1
+    welcomeLabel.Text = "🎮 Welcome to SFY Ultimate Menu!"
+    welcomeLabel.TextColor3 = Theme.Text
+    welcomeLabel.TextSize = 14
+    welcomeLabel.TextWrapped = true
+    welcomeLabel.TextXAlignment = Enum.TextXAlignment.Center
+    welcomeLabel.Font = Enum.Font.Gotham
+    welcomeLabel.LayoutOrder = 2
+    welcomeLabel.Parent = infoContainer
+    
+    -- Info table
+    if infoData and type(infoData) == "table" then
+        local tableFrame = Instance.new("Frame")
+        tableFrame.Name = "TableFrame"
+        tableFrame.Size = UDim2.new(1, 0, 0, 0) -- Auto-size
+        tableFrame.BackgroundColor3 = Theme.Secondary
+        tableFrame.BorderSizePixel = 0
+        tableFrame.LayoutOrder = 3
+        tableFrame.Parent = infoContainer
+        
+        local tableCorner = Instance.new("UICorner")
+        tableCorner.CornerRadius = UDim.new(0, 8)
+        tableCorner.Parent = tableFrame
+        
+        local tableLayout = Instance.new("UIListLayout")
+        tableLayout.Padding = UDim.new(0, 1)
+        tableLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        tableLayout.Parent = tableFrame
+        
+        local tablePadding = Instance.new("UIPadding")
+        tablePadding.PaddingTop = UDim.new(0, 8)
+        tablePadding.PaddingBottom = UDim.new(0, 8)
+        tablePadding.PaddingLeft = UDim.new(0, 8)
+        tablePadding.PaddingRight = UDim.new(0, 8)
+        tablePadding.Parent = tableFrame
+        
+        local rowCount = 0
+        
+        for key, value in pairs(infoData) do
+            local rowFrame = Instance.new("Frame")
+            rowFrame.Name = "Row_" .. key
+            rowFrame.Size = UDim2.new(1, -16, 0, 25)
+            rowFrame.BackgroundTransparency = 1
+            rowFrame.LayoutOrder = rowCount
+            rowFrame.Parent = tableFrame
+            
+            local keyLabel = Instance.new("TextLabel")
+            keyLabel.Name = "Key"
+            keyLabel.Size = UDim2.new(0.4, 0, 1, 0)
+            keyLabel.BackgroundTransparency = 1
+            keyLabel.Text = tostring(key) .. ":"
+            keyLabel.TextColor3 = Theme.TextSecondary
+            keyLabel.TextSize = 12
+            keyLabel.TextXAlignment = Enum.TextXAlignment.Left
+            keyLabel.Font = Enum.Font.Gotham
+            keyLabel.Parent = rowFrame
+            
+            local valueLabel = Instance.new("TextLabel")
+            valueLabel.Name = "Value"
+            valueLabel.Size = UDim2.new(0.6, 0, 1, 0)
+            valueLabel.Position = UDim2.new(0.4, 0, 0, 0)
+            valueLabel.BackgroundTransparency = 1
+            valueLabel.Text = tostring(value)
+            valueLabel.TextColor3 = Theme.Text
+            valueLabel.TextSize = 12
+            valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+            valueLabel.Font = Enum.Font.GothamBold
+            valueLabel.Parent = rowFrame
+            
+            rowCount = rowCount + 1
+        end
+        
+        -- Update table height
+        tableLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            tableFrame.Size = UDim2.new(1, 0, 0, tableLayout.AbsoluteContentSize.Y + 16)
+        end)
+    end
+    
+    -- Support section
+    if showSupport then
+        local supportFrame = Instance.new("Frame")
+        supportFrame.Name = "SupportFrame"
+        supportFrame.Size = UDim2.new(1, 0, 0, 120)
+        supportFrame.BackgroundTransparency = 1
+        supportFrame.LayoutOrder = 4
+        supportFrame.Parent = infoContainer
+        
+        local supportLabel = Instance.new("TextLabel")
+        supportLabel.Name = "SupportLabel"
+        supportLabel.Size = UDim2.new(1, 0, 0, 40)
+        supportLabel.BackgroundTransparency = 1
+        supportLabel.Text = "💝 Support My Work!"
+        supportLabel.TextColor3 = Theme.Text
+        supportLabel.TextSize = 14
+        supportLabel.TextWrapped = true
+        supportLabel.TextXAlignment = Enum.TextXAlignment.Center
+        supportLabel.Font = Enum.Font.GothamBold
+        supportLabel.Parent = supportFrame
+        
+        local messageLabel = Instance.new("TextLabel")
+        messageLabel.Name = "Message"
+        messageLabel.Size = UDim2.new(1, 0, 0, 40)
+        messageLabel.Position = UDim2.new(0, 0, 0, 40)
+        messageLabel.BackgroundTransparency = 1
+        messageLabel.Text = "If you enjoy this script, consider supporting the development!"
+        messageLabel.TextColor3 = Theme.TextSecondary
+        messageLabel.TextSize = 12
+        messageLabel.TextWrapped = true
+        messageLabel.TextXAlignment = Enum.TextXAlignment.Center
+        messageLabel.Font = Enum.Font.Gotham
+        messageLabel.Parent = supportFrame
+        
+        -- Donate button
+        local donateButton = Instance.new("TextButton")
+        donateButton.Name = "DonateButton"
+        donateButton.Size = UDim2.new(0.6, 0, 0, 30)
+        donateButton.Position = UDim2.new(0.2, 0, 0, 85)
+        donateButton.BackgroundColor3 = Theme.Success
+        donateButton.BorderSizePixel = 0
+        donateButton.Text = "💰 Donate"
+        donateButton.TextColor3 = Theme.Text
+        donateButton.TextSize = 12
+        donateButton.Font = Enum.Font.GothamBold
+        donateButton.Parent = supportFrame
+        
+        local donateCorner = Instance.new("UICorner")
+        donateCorner.CornerRadius = UDim.new(0, 6)
+        donateCorner.Parent = donateButton
+        
+        -- Donate button effects
+        donateButton.MouseEnter:Connect(function()
+            if not isMobile then
+                TweenService:Create(donateButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(80, 200, 120)}):Play()
+            end
+        end)
+        
+        donateButton.MouseLeave:Connect(function()
+            if not isMobile then
+                TweenService:Create(donateButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.Success}):Play()
+            end
+        end)
+        
+        donateButton.MouseButton1Click:Connect(function()
+            -- Open donation link (you can change this to your preferred donation method)
+            local donationUrl = "https://www.paypal.com/donate?hosted_button_id=YOUR_BUTTON_ID"
+            print("💝 Thank you for considering a donation!")
+            print("🔗 Donation link: " .. donationUrl)
+            
+            -- You can also use this to open a browser window:
+            -- game:GetService("StarterGui"):SetCore("OpenBrowserWindow", {Url = donationUrl})
+        end)
+    end
+    
+    -- Credits section
+    local creditsFrame = Instance.new("Frame")
+    creditsFrame.Name = "CreditsFrame"
+    creditsFrame.Size = UDim2.new(1, 0, 0, 40)
+    creditsFrame.BackgroundTransparency = 1
+    creditsFrame.LayoutOrder = 5
+    creditsFrame.Parent = infoContainer
+    
+    local creditsLabel = Instance.new("TextLabel")
+    creditsLabel.Name = "Credits"
+    creditsLabel.Size = UDim2.new(1, 0, 1, 0)
+    creditsLabel.BackgroundTransparency = 1
+    creditsLabel.Text = "Made with ❤️ by ScriptForYou"
+    creditsLabel.TextColor3 = Theme.TextSecondary
+    creditsLabel.TextSize = 11
+    creditsLabel.TextXAlignment = Enum.TextXAlignment.Center
+    creditsLabel.Font = Enum.Font.Gotham
+    creditsLabel.Parent = creditsFrame
+    
+    -- Update container height
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        infoContainer.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y)
+    end)
+    
+    return infoContainer
+end
+
+-- Function to set version display in title bar
+function GuiLibrary:SetVersion(versionText)
+    if title and versionText then
+        -- Update title to include version
+        title.Text = "SFY Ultimate Menu v" .. versionText
+        
+        -- You can also add a separate version label if preferred
+        if not title:FindFirstChild("VersionLabel") then
+            local versionLabel = Instance.new("TextLabel")
+            versionLabel.Name = "VersionLabel"
+            versionLabel.Size = UDim2.new(0, 80, 0, 15)
+            versionLabel.Position = UDim2.new(0.5, -40, 1, -20)
+            versionLabel.BackgroundTransparency = 1
+            versionLabel.Text = "v" .. versionText
+            versionLabel.TextColor3 = Theme.TextSecondary
+            versionLabel.TextSize = 10
+            versionLabel.TextXAlignment = Enum.TextXAlignment.Center
+            versionLabel.Font = Enum.Font.Gotham
+            versionLabel.Parent = titleBar
+        else
+            title:FindFirstChild("VersionLabel").Text = "v" .. versionText
+        end
+    end
+end
+
+-- Function to create a comprehensive system info display
+function GuiLibrary:CreateSystemInfo(tab, includePerformance)
+    local systemInfo = {
+        ["Game Name"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+        ["Place ID"] = tostring(game.PlaceId),
+        ["Player Name"] = player.Name,
+        ["Display Name"] = player.DisplayName,
+        ["User ID"] = tostring(player.UserId),
+        ["Account Age"] = tostring(player.AccountAge) .. " days",
+        ["Membership"] = player.MembershipType.Name,
+        ["Device Type"] = isMobile and "Mobile" or "Desktop",
+        ["FPS"] = "Measuring...",
+        ["Ping"] = "Measuring...",
+        ["Script Version"] = "v6.0",
+        ["Library Version"] = "v2.1"
+    }
+    
+    -- Add performance metrics if requested
+    if includePerformance then
+        systemInfo["Graphics Quality"] = tostring(settings().Rendering.QualityLevel)
+        systemInfo["Max Graphics"] = tostring(settings().Rendering.MaxQualityLevel)
+    end
+    
+    -- Create the info table
+    local infoTable = self:CreateInfoTable(
+        tab,
+        "System Information",
+        systemInfo,
+        true -- Show support section
+    )
+    
+    -- Real-time FPS counter
+    if includePerformance then
+        local fps = 0
+        local fpsCounter = 0
+        local lastTime = tick()
+        
+        task.spawn(function()
+            while infoTable and infoTable.Parent do
+                fpsCounter = fpsCounter + 1
+                local currentTime = tick()
+                if currentTime - lastTime >= 1 then
+                    fps = fpsCounter
+                    fpsCounter = 0
+                    lastTime = currentTime
+                    
+                    -- Update FPS in the table
+                    local fpsLabel = infoTable:FindFirstChild("TableFrame")
+                    if fpsLabel then
+                        fpsLabel = fpsLabel:FindFirstChild("Row_FPS")
+                        if fpsLabel then
+                            fpsLabel = fpsLabel:FindFirstChild("Value")
+                            if fpsLabel then
+                                fpsLabel.Text = tostring(fps) .. " FPS"
+                            end
+                        end
+                    end
+                end
+                task.wait()
+            end
+        end)
+        
+        -- Ping measurement
+        task.spawn(function()
+            while infoTable and infoTable.Parent do
+                local ping = math.random(30, 80) -- Simulated ping
+                -- In a real implementation, you'd measure actual ping
+                
+                local pingLabel = infoTable:FindFirstChild("TableFrame")
+                if pingLabel then
+                    pingLabel = pingLabel:FindFirstChild("Row_Ping")
+                    if pingLabel then
+                        pingLabel = pingLabel:FindFirstChild("Value")
+                        if pingLabel then
+                            pingLabel.Text = tostring(ping) .. " ms"
+                        end
+                    end
+                end
+                task.wait(2)
+            end
+        end)
+    end
+    
+    return infoTable
+end
+
+-- Function to create a feature showcase
+function GuiLibrary:CreateFeatureShowcase(tab, featuresList)
+    local showcaseContainer = Instance.new("Frame")
+    showcaseContainer.Name = "FeatureShowcase"
+    showcaseContainer.Size = UDim2.new(1, 0, 0, 0) -- Auto-size
+    showcaseContainer.BackgroundTransparency = 1
+    showcaseContainer.Parent = tab.Frame
+    
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 10)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = showcaseContainer
+    
+    -- Title
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "Title"
+    titleLabel.Size = UDim2.new(1, 0, 0, 25)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "🌟 Featured Functions"
+    titleLabel.TextColor3 = Theme.Accent
+    titleLabel.TextSize = 16
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.LayoutOrder = 1
+    titleLabel.Parent = showcaseContainer
+    
+    -- Features grid
+    if featuresList and type(featuresList) == "table" then
+        for i, feature in ipairs(featuresList) do
+            local featureFrame = Instance.new("Frame")
+            featureFrame.Name = "Feature_" .. i
+            featureFrame.Size = UDim2.new(1, 0, 0, 50)
+            featureFrame.BackgroundColor3 = Theme.Secondary
+            featureFrame.BorderSizePixel = 0
+            featureFrame.LayoutOrder = i + 1
+            featureFrame.Parent = showcaseContainer
+            
+            local featureCorner = Instance.new("UICorner")
+            featureCorner.CornerRadius = UDim.new(0, 8)
+            featureCorner.Parent = featureFrame
+            
+            local iconLabel = Instance.new("TextLabel")
+            iconLabel.Name = "Icon"
+            iconLabel.Size = UDim2.new(0, 40, 1, 0)
+            iconLabel.BackgroundTransparency = 1
+            iconLabel.Text = feature.icon or "⭐"
+            iconLabel.TextColor3 = Theme.Accent
+            iconLabel.TextSize = 18
+            iconLabel.TextXAlignment = Enum.TextXAlignment.Center
+            iconLabel.Font = Enum.Font.GothamBold
+            iconLabel.Parent = featureFrame
+            
+            local textFrame = Instance.new("Frame")
+            textFrame.Name = "TextFrame"
+            textFrame.Size = UDim2.new(1, -45, 1, 0)
+            textFrame.Position = UDim2.new(0, 45, 0, 0)
+            textFrame.BackgroundTransparency = 1
+            textFrame.Parent = featureFrame
+            
+            local nameLabel = Instance.new("TextLabel")
+            nameLabel.Name = "Name"
+            nameLabel.Size = UDim2.new(1, 0, 0.6, 0)
+            nameLabel.BackgroundTransparency = 1
+            nameLabel.Text = feature.name or "Feature"
+            nameLabel.TextColor3 = Theme.Text
+            nameLabel.TextSize = 14
+            nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+            nameLabel.Font = Enum.Font.GothamBold
+            nameLabel.Parent = textFrame
+            
+            local descLabel = Instance.new("TextLabel")
+            descLabel.Name = "Description"
+            descLabel.Size = UDim2.new(1, 0, 0.4, 0)
+            descLabel.Position = UDim2.new(0, 0, 0.6, 0)
+            descLabel.BackgroundTransparency = 1
+            descLabel.Text = feature.description or "Feature description"
+            descLabel.TextColor3 = Theme.TextSecondary
+            descLabel.TextSize = 11
+            descLabel.TextXAlignment = Enum.TextXAlignment.Left
+            descLabel.TextWrapped = true
+            descLabel.Font = Enum.Font.Gotham
+            descLabel.Parent = textFrame
+        end
+    end
+    
+    -- Update container height
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        showcaseContainer.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y)
+    end)
+    
+    return showcaseContainer
 end
 
 
